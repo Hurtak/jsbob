@@ -1,8 +1,6 @@
 # TODO
 
 ## Main
-- async await
-- execa
 - cash
 - tasks
 - task dependencies
@@ -11,3 +9,4 @@
 ## Other
 - update-notifier?
 - fill package JSON
+- fill README.md
