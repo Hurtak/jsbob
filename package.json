@@ -1,0 +1,24 @@
+{
+  "name": "jsbob",
+  "version": "0.0.1",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "keywords": [],
+  "description": "",
+  "dependencies": {
+    "babel-plugin-transform-async-to-generator": "6.8.0",
+    "babel-register": "6.14.0",
+    "execa": "0.4.0",
+    "shelljs": "0.7.4"
+  },
+  "babel": {
+    "plugins": ["transform-async-to-generator"]
+  },
+  "standard": {
+    "parser": "babel-eslint"
+  }
+}
