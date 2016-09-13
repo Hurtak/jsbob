@@ -1,4 +1,5 @@
 'use strict'
+
 require('hard-rejection')()
 
 const execa = require('execa')
