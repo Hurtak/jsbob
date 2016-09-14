@@ -13,12 +13,10 @@ function indentConsoleOutput (str, indentation = 4) {
   console.log(out)
 }
 
-function logPrefixed (str, err = false) {
+function logPrefixed (str) {
   let prefix = new Date()
   prefix = getConsolePrefix(prefix)
   prefix = chalk.bold.white(prefix)
-
-  str = err ? chalk.bold.red(str) : chalk.bold.green(str)
 
   console.log(`${prefix} ${str}`)
 }
