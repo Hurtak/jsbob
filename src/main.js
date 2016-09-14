@@ -9,12 +9,11 @@ const log = require('./log.js')
 
 // main
 
-function exec (str) {
+async function exec (str) {
   log.prefixed('running')
   log.indented(lodash.trim(str))
 
-  const {stdout, stderr} = execa.shellSync(str)
-
+  const {stdout, stderr} = await execa.shell(str)
   if (stdout) {
     log.prefixed('stdout')
     log.indented(stdout)
@@ -25,10 +24,12 @@ function exec (str) {
   }
 }
 
-function main () {
-  // exec('cat test/app/images/controls/next.svg | svgo -i - -o -')
-  // exec('svgo -f test/app/images/controls -o test/dist')
-  exec(`
+async function main () {
+//   await exec('ls --help')
+//   await exec('svgo --help')
+//   await exec('cat test/app/images/controls/next.svg | svgo -i - -o -')
+//   await exec('svgo -f test/app/images/controls -o test/dist')
+  await exec(`
     echo "multiline first"
     echo "multiline second"
   `)
