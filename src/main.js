@@ -88,20 +88,20 @@ async function main () {
   data = await execTask(data)
   console.log(data)
 
-  console.log('async Promise.race task running')
+  console.log('async Promise.all task running')
 
-  data = 100
-
-  console.log(data)
-  data = await syncFunctionTask(data)
-  console.log(data)
-  data = await Promise.race([
-    asyncPromiseTask(data),
-    asyncAwaitedPromiseTask(data)
+  const result = await Promise.all([
+    syncFunctionTask(0),
+    asyncPromiseTask(1),
+    asyncAwaitedPromiseTask(2),
+    new Promise(async (resolve) => {
+      let x = 2
+      x = await asyncPromiseTask(x)
+      x = await asyncAwaitedPromiseTask(x)
+      resolve(x)
+    })
   ])
-  console.log(data)
-  data = await execTask(data)
-  console.log(data)
+  console.log(result)
 
 
   // await multilineExec()
