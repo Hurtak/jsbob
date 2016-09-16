@@ -10,6 +10,8 @@ const log = require('./log.js')
 
 // main
 
+const tasks = {}
+
 async function exec (str) {
   // const logRunning = chalk.bold.cyan('running')
   // log.prefixed(logRunning)
@@ -37,85 +39,35 @@ async function exec (str) {
   }
 }
 
-function task (func) {
-  return async (data) => {
-    return await Promise.resolve(func(data))
+// function task (func) {
+//   return async (data) => {
+//     return await Promise.resolve(func(data))
+//   }
+// }
+
+function task (taskName, cb) {
+  if (taskName in tasks) {
+    throw new Error(`Task "${taskName}" is already defined.`)
   }
+
+  tasks[taskName] = cb
 }
 
-// tasks
-
-const syncFunctionTask = task((input) => {
-  return input + 1
-})
-
-const asyncPromiseTask = task((input) => {
-  return new Promise((resolve, reject) => {
-    resolve(input + 1)
-  })
-})
-
-const asyncAwaitedPromiseTask = task(async (input) => {
-  const result = await new Promise((resolve, reject) => {
-    resolve(input + 1)
-  })
-
-  return result
-})
-
-const execTask = task(async (input) => {
-  const res = await exec(`echo $((${ input} + 1))`)
-  return Number(res)
-})
-
-// main
-
-async function main () {
-  console.log()
-
-  const logStart = chalk.bgWhite.blue('Starting main task')
-  log.prefixed(logStart)
-
-  let data = 0
-
-  console.log(data)
-  data = await syncFunctionTask(data)
-  console.log(data)
-  data = await asyncPromiseTask(data)
-  console.log(data)
-  data = await asyncAwaitedPromiseTask(data)
-  console.log(data)
-  data = await execTask(data)
-  console.log(data)
-
-  console.log('async Promise.all task running')
-
-  const result = await Promise.all([
-    syncFunctionTask(0),
-    asyncPromiseTask(1),
-    asyncAwaitedPromiseTask(2),
-    new Promise(async (resolve) => {
-      let x = 2
-      x = await asyncPromiseTask(x)
-      x = await asyncAwaitedPromiseTask(x)
-      resolve(x)
-    })
-  ])
-  console.log(result)
-
-
-  // await multilineExec()
-  // await regularSyncFunction()
-
-//   await exec('svgo --help')
-//   await exec('cat test/app/images/controls/next.svg | svgo -i - -o -')
-//   await exec('svgo -f test/app/images/controls -o test/dist')
-
-  // test throwing
-  // await exec(`echo "echo ok 1"`)
-  // await exec(`>&2 echo "echo error"`)
-  // await exec(`exit 1`)
-  // await exec(`echo "echo ok 2"`)
+function run (taskName) {
+  if (!(taskName in tasks)) {
+    throw new Error(`You are trying to run task "${taskName}" which does not exists.`)
+  }
+  tasks[taskName]()
 }
 
-main()
+function concat (...strings) {
+  return strings.reduce((currentString, concated) => concated + currentString)
+}
+
+// export
+
+module.exports = {
+  task,
+  run,
+  exec
+}
