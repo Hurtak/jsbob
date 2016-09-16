@@ -26,10 +26,10 @@ jsbob.task('main', async () => {
 jsbob.task('scripts-handle-all', async () => {
   const files = await glob('./fixtures/**/*.css')
 
-  const contents = {}
 
   // 0. get the files one by one
   // TODO: is it faster to get them concurrently?
+  const contents = {}
   for (const filePath of files) {
     const content = await fs.readFile(filePath, 'utf-8')
     contents[filePath] = content
@@ -55,6 +55,10 @@ jsbob.task('scripts-handle-all', async () => {
 })
 
 jsbob.run('scripts-handle-all')
+
+// TODO
+// only CLI example
+// CLI + code combination example - piping into CLI and from (could this be streamed?)
 
 // tasks
 
