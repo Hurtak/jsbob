@@ -1,60 +1,101 @@
-const path = require('path')
-const fs = require('fs-promise')
-const globOriginal = require('glob')
+// const path = require('path')
+// const fs = require('fs-promise')
+// const globOriginal = require('glob')
 
-const autoprefixer = require('autoprefixer')
-const postcss = require('postcss')
-const CleanCSS = require('clean-css')
-
-const glob = function (pattern, options) {
-  return new Promise(function (resolve, reject) {
-    globOriginal(pattern, options, function (err, files) {
-      return err === null ? resolve(files) : reject(err)
-    })
-  })
-}
+// const postcss = require('postcss')
+// const postcssImport = require('postcss-import')
+// const CleanCSS = require('clean-css')
 
 const jsbob = require('../src/main.js')
 
 jsbob.task('main', async () => {
-  jsbob.run('test')
+  await jsbob.run('program')
+  // await jsbob.run('exec')
 })
 
 // cases
 
 // 1. I will get the files by myself
-jsbob.task('scripts-handle-all', async () => {
-  const files = await glob('./fixtures/**/*.css')
+jsbob.task('program', async () => {
+  console.time(1)
+  const autoprefixedFiles = await jsbob.run('styles:autoprefixer')
+  console.log(autoprefixedFiles)
+  console.timeEnd(1)
+  console.time(2)
+  const autoprefixedFiles2 = await jsbob.run('styles:autoprefixer')
+  console.log(autoprefixedFiles2)
+  console.timeEnd(2)
+  console.time(3)
+  const autoprefixedFiles3 = await jsbob.run('styles:autoprefixer')
+  console.log(autoprefixedFiles3)
+  console.timeEnd(3)
+  // 0. get the file
+  // const file = await fs.readFile(filePath, 'utf-8')
 
+  // // 1. autoprefix
+  // const contentsPrefixed = {}
+  // for (const filePath in contents) {
+  //   const prefixed = await postcss([postcssImport]).process(contents[filePath]).css
+  //   contentsPrefixed[filePath] = prefixed
+  // }
 
-  // 0. get the files one by one
-  // TODO: is it faster to get them concurrently?
-  const contents = {}
-  for (const filePath of files) {
-    const content = await fs.readFile(filePath, 'utf-8')
-    contents[filePath] = content
-  }
+  // // 2. concat
+  // let concatedFiles = ''
+  // for (const filePath in contentsPrefixed) {
+  //   concatedFiles += contentsPrefixed[filePath]
+  // }
 
-  // 1. autoprefix
-  const contentsPrefixed = {}
-  for (const filePath in contents) {
-    const prefixed = await postcss([autoprefixer]).process(contents[filePath]).css
-    contentsPrefixed[filePath] = prefixed
-  }
+  // // 3. minify
+  // const minified = new CleanCSS().minify(concatedFiles).styles
 
-  // 2. concat
-  let concatedFiles = ''
-  for (const filePath in contentsPrefixed) {
-    concatedFiles += contentsPrefixed[filePath]
-  }
-
-  // 3. minify
-  const minified = new CleanCSS().minify(concatedFiles).styles;
-
-  console.log(minified)
+  // await fs.outputFile('./dist/program.css', minified)
 })
 
-jsbob.run('scripts-handle-all')
+jsbob.task('styles:autoprefixer', {
+  from: './examples/fixtures/**/*.css'
+}, async (file) => {
+  await new Promise((resolve) => setTimeout(resolve, 2000))
+
+  return file
+})
+
+// 1. Do it all in the CLI
+// jsbob.task('exec', async () => {
+//   // 1. autoprefix
+//   await jsbob.exec(`
+//     cat ./fixtures/*.css \
+//       | postcss --use autoprefixer \
+//       | cleancss \
+//       > ./dist/exec.css
+//   `)
+
+//   // // 0. get the files one by one
+//   // const contents = {}
+//   // for (const filePath of files) {
+//   //   const content = await fs.readFile(filePath, 'utf-8')
+//   //   contents[filePath] = content
+//   // }
+
+//   // // 1. autoprefix
+//   // const contentsPrefixed = {}
+//   // for (const filePath in contents) {
+//   //   const prefixed = await postcss([autoprefixer]).process(contents[filePath]).css
+//   //   contentsPrefixed[filePath] = prefixed
+//   // }
+
+//   // // 2. concat
+//   // let concatedFiles = ''
+//   // for (const filePath in contentsPrefixed) {
+//   //   concatedFiles += contentsPrefixed[filePath]
+//   // }
+
+//   // // 3. minify
+//   // const minified = new CleanCSS().minify(concatedFiles).styles
+
+//   // console.log(minified)
+// })
+
+jsbob.run('main')
 
 // TODO
 // only CLI example

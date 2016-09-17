@@ -12,6 +12,8 @@
 - disable incremental recompilation
 - have a way to specify if we want to send files into the task all at once or one by one as they are read from FS, if we do this we can have incremental recompilation
 - once node7 is out, recommend async methods
+- https://www.npmjs.com/package/exec-stream
+- https://github.com/gulpjs/glob-stream
 
 ## Other
 - update-notifier?
