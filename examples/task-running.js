@@ -17,18 +17,21 @@ jsbob.task('main', async () => {
 
 // 1. I will get the files by myself
 jsbob.task('program', async () => {
-  console.time(1)
-  const autoprefixedFiles = await jsbob.run('styles:autoprefixer')
-  console.log(autoprefixedFiles)
-  console.timeEnd(1)
-  console.time(2)
-  const autoprefixedFiles2 = await jsbob.run('styles:autoprefixer')
-  console.log(autoprefixedFiles2)
-  console.timeEnd(2)
-  console.time(3)
-  const autoprefixedFiles3 = await jsbob.run('styles:autoprefixer')
-  console.log(autoprefixedFiles3)
-  console.timeEnd(3)
+  let data = 0
+  console.log(data)
+
+  data = await jsbob.run('program: none', data)
+  console.log(data)
+
+  data = await jsbob.run('program: data input', data)
+  console.log(data)
+
+  data = await jsbob.run('program: file input', data)
+  console.log(data)
+
+  data = await jsbob.run('program: file output', data)
+  console.log(data)
+
   // 0. get the file
   // const file = await fs.readFile(filePath, 'utf-8')
 
@@ -51,13 +54,33 @@ jsbob.task('program', async () => {
   // await fs.outputFile('./dist/program.css', minified)
 })
 
-jsbob.task('styles:autoprefixer', {
-  from: './examples/fixtures/**/*.css'
-}, async (file) => {
-  await new Promise((resolve) => setTimeout(resolve, 2000))
-
-  return file
+jsbob.task('program: none', async () => {
+  return 1
 })
+
+jsbob.task('program: data input', async (data) => {
+  return data + 1
+})
+
+jsbob.task('program: file input', {
+  from: './examples/fixtures/number.txt'
+}, async (fileContent, data) => {
+  return Number(fileContent) + data
+})
+
+jsbob.task('program: file output', {
+  to: './examples/dist/program.txt'
+}, async (data) => {
+  return data + 1
+})
+
+// jsbob.task('program: none', {
+//   from: './examples/fixtures/**/*.css'
+// }, async (file) => {
+//   await new Promise((resolve) => setTimeout(resolve, 2000))
+
+//   return file
+// })
 
 // 1. Do it all in the CLI
 // jsbob.task('exec', async () => {

@@ -61,23 +61,18 @@ function task (taskName, userConfOrCb, userCb) {
   }
 }
 
-async function run (taskName) {
+async function run (taskName, data) {
   if (!(taskName in tasks)) {
     throw new Error(`You are trying to run task "${taskName}" which does not exists.`)
   }
 
   const task = tasks[taskName]
 
-  const {
-    callback,
-    from
-  } = tasks[taskName]
-
-  if (!from) {
-    return callback()
+  if (!task.from) {
+    return task.callback(data)
   }
 
-  const promise = new Promise((resolve, reject) => {
+  const result = await new Promise((resolve, reject) => {
     const files = []
 
     let nrOfFiles = 0
@@ -90,7 +85,7 @@ async function run (taskName) {
       resolve(files)
     }
 
-    const stream = globStream.create(from)
+    const stream = globStream.create(task.from)
 
     stream.on('data', async function ({ path }) {
       nrOfFiles++
@@ -113,7 +108,7 @@ async function run (taskName) {
         cache.lastModification = lastModification
 
         const fileContent = await fs.readFile(path, 'utf-8')
-        const modifiedContent = await Promise.resolve(callback(fileContent))
+        const modifiedContent = await Promise.resolve(task.callback(fileContent, data))
 
         cache.data = modifiedContent
         files.push(modifiedContent)
@@ -133,7 +128,15 @@ async function run (taskName) {
     })
   })
 
-  return await promise
+  // TODO: handle if promise is rejected and result is not array
+  switch (result.length) {
+    case 0:
+      return null
+    case 1:
+      return result[0]
+    default:
+      return result
+  }
 }
 
 // export
