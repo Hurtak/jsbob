@@ -23,13 +23,31 @@ jsbob.task('program', async () => {
   data = await jsbob.run('program: none', data)
   console.log(data)
 
+  data = await jsbob.run('program: none async', data)
+  console.log(data)
+
   data = await jsbob.run('program: data input', data)
+  console.log(data)
+
+  data = await jsbob.run('program: data input async', data)
   console.log(data)
 
   data = await jsbob.run('program: file input', data)
   console.log(data)
 
+  data = await jsbob.run('program: file input async', data)
+  console.log(data)
+
   data = await jsbob.run('program: file output', data)
+  console.log(data)
+
+  data = await jsbob.run('program: file output async', data)
+  console.log(data)
+
+  data = await jsbob.run('program: data input file output', data)
+  console.log(data)
+
+  data = await jsbob.run('program: data input file output async', data)
   console.log(data)
 
   // 0. get the file
@@ -58,20 +76,58 @@ jsbob.task('program: none', async () => {
   return 1
 })
 
+jsbob.task('program: none async', async () => {
+  return await new Promise(resolve => setTimeout(resolve(2), 10))
+})
+
 jsbob.task('program: data input', async (data) => {
   return data + 1
+})
+
+jsbob.task('program: data input async', async (data) => {
+  const one = await new Promise(resolve => setTimeout(resolve(1), 10))
+  return data + one
 })
 
 jsbob.task('program: file input', {
   from: './examples/fixtures/number.txt'
 }, async (fileContent, data) => {
-  return Number(fileContent) + data
+  return data + Number(fileContent)
+})
+
+jsbob.task('program: file input async', {
+  from: './examples/fixtures/number.txt'
+}, async (fileContent, data) => {
+  const zero = await new Promise(resolve => setTimeout(resolve(0), 10))
+  return data + Number(fileContent) + zero
 })
 
 jsbob.task('program: file output', {
-  to: './examples/dist/program.txt'
+  to: './examples/dist/program1.txt'
 }, async (data) => {
   return data + 1
+})
+
+jsbob.task('program: file output async', {
+  to: './examples/dist/program2.txt'
+}, async (data) => {
+  const one = await new Promise(resolve => setTimeout(resolve(1), 10))
+  return data + one
+})
+
+jsbob.task('program: data input file output', {
+  from: './examples/fixtures/number.txt',
+  to: './examples/dist/program3.txt'
+}, async (fileContent, data) => {
+  return data + Number(fileContent)
+})
+
+jsbob.task('program: data input file output async', {
+  from: './examples/fixtures/number.txt',
+  to: './examples/dist/program4.txt'
+}, async (fileContent, data) => {
+  const zero = await new Promise(resolve => setTimeout(resolve(0), 10))
+  return data + Number(fileContent) + zero
 })
 
 // jsbob.task('program: none', {

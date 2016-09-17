@@ -55,10 +55,16 @@ function task (taskName, userConfOrCb, userCb) {
     throw new Error(`Task "${taskName}" is already defined.`)
   }
 
-  tasks[taskName] = {
-    callback: callback,
-    from: config.from
-  }
+  // TODO: validate if each config thing is valid
+  // TODO: iterate over all keys of config object and check if they are correct
+  //       maybe event do autocorrect, if user has typo?
+  // TODO: also do this validation only once at the startup
+  const finalConfig = {}
+  if (callback) finalConfig.callback = callback
+  if (config.from) finalConfig.from = config.from
+  if (config.to) finalConfig.to = config.to
+
+  tasks[taskName] = finalConfig
 }
 
 async function run (taskName, data) {
@@ -66,77 +72,88 @@ async function run (taskName, data) {
     throw new Error(`You are trying to run task "${taskName}" which does not exists.`)
   }
 
+  let result
   const task = tasks[taskName]
 
-  if (!task.from) {
-    return task.callback(data)
-  }
+  if (task.from) {
+    result = await new Promise((resolve, reject) => {
+      const files = []
 
-  const result = await new Promise((resolve, reject) => {
-    const files = []
+      let nrOfFiles = 0
+      let nrOfProcessedFiles = 0
+      let streamEnded = false
 
-    let nrOfFiles = 0
-    let nrOfProcessedFiles = 0
-    let streamEnded = false
+      function resolveIfDone () {
+        if (!streamEnded) return
+        if (nrOfProcessedFiles !== nrOfFiles) return
+        resolve(files)
+      }
 
-    function resolveIfDone () {
-      if (!streamEnded) return
-      if (nrOfProcessedFiles !== nrOfFiles) return
-      resolve(files)
+      const stream = globStream.create(task.from)
+
+      stream.on('data', async function ({ path }) {
+        nrOfFiles++
+
+        const { mtime } = await fs.stat(path)
+        const lastModification = mtime.getTime()
+
+        if (!task.cache) {
+          task.cache = {}
+        }
+
+        if (!task.cache[path]) {
+          task.cache[path] = {}
+        }
+
+        const cache = task.cache[path]
+        if (cache.lastModification === lastModification) {
+          files.push(cache.data)
+        } else {
+          cache.lastModification = lastModification
+
+          const fileContent = await fs.readFile(path, 'utf-8')
+          const modifiedContent = await task.callback(fileContent, data)
+
+          cache.data = modifiedContent
+          files.push(modifiedContent)
+        }
+
+        nrOfProcessedFiles++
+        resolveIfDone()
+      })
+
+      stream.on('end', function () {
+        streamEnded = true
+        resolveIfDone()
+      })
+
+      stream.on('error', function (error) {
+        reject(error)
+      })
+    })
+
+    // TODO: handle if promise is rejected and result is not array
+    // TODO: return result[0] if user is not globbing but specifying one file?
+    switch (result.length) {
+      case 0:
+        result = null
+        break
+      case 1:
+        result = result[0]
+        break
+      default:
+        break
     }
-
-    const stream = globStream.create(task.from)
-
-    stream.on('data', async function ({ path }) {
-      nrOfFiles++
-
-      const { mtime } = await fs.stat(path)
-      const lastModification = mtime.getTime()
-
-      if (!task.cache) {
-        task.cache = {}
-      }
-
-      if (!task.cache[path]) {
-        task.cache[path] = {}
-      }
-
-      const cache = task.cache[path]
-      if (cache.lastModification === lastModification) {
-        files.push(cache.data)
-      } else {
-        cache.lastModification = lastModification
-
-        const fileContent = await fs.readFile(path, 'utf-8')
-        const modifiedContent = await Promise.resolve(task.callback(fileContent, data))
-
-        cache.data = modifiedContent
-        files.push(modifiedContent)
-      }
-
-      nrOfProcessedFiles++
-      resolveIfDone()
-    })
-
-    stream.on('end', function () {
-      streamEnded = true
-      resolveIfDone()
-    })
-
-    stream.on('error', function (error) {
-      reject(error)
-    })
-  })
-
-  // TODO: handle if promise is rejected and result is not array
-  switch (result.length) {
-    case 0:
-      return null
-    case 1:
-      return result[0]
-    default:
-      return result
+  } else {
+    result = await task.callback(data)
   }
+
+  if (task.to) {
+    // TODO: use path.join? support absolute paths?
+    await fs.outputFile(task.to, result)
+  }
+
+  return result
 }
 
 // export
