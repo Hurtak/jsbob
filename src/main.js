@@ -80,16 +80,22 @@ async function run (taskName) {
   const promise = new Promise((resolve, reject) => {
     const files = []
 
-    const promisesStat = []
-    const filesPromises = []
-    const filesTransformationPromises = []
+    let nrOfFiles = 0
+    let nrOfProcessedFiles = 0
+    let streamEnded = false
+
+    function resolveIfDone () {
+      if (!streamEnded) return
+      if (nrOfProcessedFiles !== nrOfFiles) return
+      resolve(files)
+    }
 
     const stream = globStream.create(from)
 
     stream.on('data', async function ({ path }) {
-      const statPromise = fs.stat(path)
-      promisesStat.push(statPromise)
-      const { mtime } = await statPromise
+      nrOfFiles++
+
+      const { mtime } = await fs.stat(path)
       const lastModification = mtime.getTime()
 
       if (!task.cache) {
@@ -103,27 +109,23 @@ async function run (taskName) {
       const cache = task.cache[path]
       if (cache.lastModification === lastModification) {
         files.push(cache.data)
-        return
+      } else {
+        cache.lastModification = lastModification
+
+        const fileContent = await fs.readFile(path, 'utf-8')
+        const modifiedContent = await Promise.resolve(callback(fileContent))
+
+        cache.data = modifiedContent
+        files.push(modifiedContent)
       }
-      cache.lastModification = lastModification
 
-      const fileContentPromise = fs.readFile(path, 'utf-8')
-      filesPromises.push(fileContentPromise)
-      const fileContent = await fileContentPromise
-
-      const fileTransformationPromise = Promise.resolve(callback(fileContent))
-      filesTransformationPromises.push(fileTransformationPromise)
-      const modifiedContent = await fileTransformationPromise
-
-      cache.data = modifiedContent
-      files.push(modifiedContent)
+      nrOfProcessedFiles++
+      resolveIfDone()
     })
 
-    stream.on('end', async function () {
-      await Promise.all(promisesStat)
-      await Promise.all(filesPromises)
-      await Promise.all(filesTransformationPromises)
-      resolve(files)
+    stream.on('end', function () {
+      streamEnded = true
+      resolveIfDone()
     })
 
     stream.on('error', function (error) {
