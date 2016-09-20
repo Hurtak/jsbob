@@ -1,6 +1,7 @@
 # TODO
 
 ## Main
+- write docs, use https://github.com/thejameskyle/documentation-handbook for inspiration
 - consistent indentation of input
 - cash
 - tasks
