@@ -15,6 +15,7 @@
 - once node7 is out, recommend async methods
 - https://www.npmjs.com/package/exec-stream
 - https://github.com/gulpjs/glob-stream
+- add pretty-error package?
 
 ## Other
 - update-notifier?
