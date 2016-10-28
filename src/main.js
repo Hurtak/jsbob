@@ -76,7 +76,7 @@ async function run (taskName, data) {
   const task = tasks[taskName]
 
   const timeStart = Date.now()
-  log.prefixed(`→ ${ taskName }`)
+  log.prefixed(`→ ${taskName}`)
 
   if (task.from) {
     result = await new Promise((resolve, reject) => {
@@ -103,7 +103,6 @@ async function run (taskName, data) {
         if (!task.cache) {
           task.cache = {}
         }
-
         if (!task.cache[path]) {
           task.cache[path] = {}
         }
@@ -157,7 +156,7 @@ async function run (taskName, data) {
   }
 
   const taskTime = Date.now() - timeStart
-  log.prefixed(`♥ ${ taskName } - ${ taskTime }ms`)
+  log.prefixed(`♥ ${taskName} - ${taskTime}ms`)
   return result
 }
 

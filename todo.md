@@ -1,12 +1,16 @@
 # TODO
 
 ## Main
+- do not show outputs in test
 - read files relative to task directory
 - read files in stream
 - have file for starting tests
 - validate dist file contents
 - test concurency of tasks
 - test if cache is working
+- persistant cache in some folder
+- caching per task
+  - think if this is good idea to have turned on by default
 
 - rename to
   - cake
