@@ -75,6 +75,8 @@ async function run (taskName, data) {
   let result
   const task = tasks[taskName]
 
+  const timeStart = Date.now()
+  log.prefixed(`→ ${ taskName }`)
   if (task.from) {
     result = await new Promise((resolve, reject) => {
       const files = []
@@ -153,6 +155,8 @@ async function run (taskName, data) {
     await fs.outputFile(task.to, result)
   }
 
+  const taskTime = Date.now() - timeStart
+  log.prefixed(`♥ ${ taskName } - ${ taskTime }ms`)
   return result
 }
 
