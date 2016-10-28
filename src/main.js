@@ -77,6 +77,7 @@ async function run (taskName, data) {
 
   const timeStart = Date.now()
   log.prefixed(`→ ${ taskName }`)
+
   if (task.from) {
     result = await new Promise((resolve, reject) => {
       const files = []

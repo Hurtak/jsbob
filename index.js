@@ -1,3 +1,3 @@
 require('babel-register')
 
-require('./examples/task-running.js')
+require('./test/1-task-types/main.js')

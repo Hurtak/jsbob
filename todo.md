@@ -1,15 +1,17 @@
 # TODO
 
 ## Main
+- read files relative to task directory
 - read files in stream
 - have file for starting tests
 - validate dist file contents
+- test concurency of tasks
+- test if cache is working
 
 - rename to
   - cake
   - jsmake
   - jbbt
-  -
 - write docs, use https://github.com/thejameskyle/documentation-handbook for inspiration
 - consistent indentation of input
 - cash
