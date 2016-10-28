@@ -1,6 +1,10 @@
 # TODO
 
 ## Main
+- read files in stream
+- have file for starting tests
+- validate dist file contents
+
 - rename to
   - cake
   - jsmake
