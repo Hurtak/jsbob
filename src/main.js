@@ -10,9 +10,44 @@ const fs = require('fs-promise')
 
 const log = require('./log.js')
 
-// main
+// state
 
 const tasks = {}
+const config = {
+  logLevel: 1
+}
+
+// functions
+
+function configure (userConfig) {
+  // validate
+  if (!lodash.isObject(userConfig)) {
+    console.error(
+      '"configure" method only accepts configuration object, you gave it: ',
+      userConfig
+    )
+    process.exit(1)
+  }
+
+  const validKeys = Object.keys(config)
+  for (const userConfigKey in userConfig) {
+    if (validKeys.indexOf(userConfigKey) === -1) {
+      console.error(
+        'Configuration object passed into the "configure" method cointains invalid data.',
+        'You supplied field with key named "' + userConfigKey + '"',
+        'Valid keys for the config object are the following: ' + validKeys.map(x => `"${x}"`).join(', ')
+      )
+      process.exit(1)
+    }
+  }
+
+  // update global config
+  // TODO: validate each field
+  for (const key in config) {
+    if (!(key in userConfig)) continue
+    config[key] = userConfig[key]
+  }
+}
 
 async function exec (str) {
   // const logRunning = chalk.bold.cyan('running')
@@ -59,12 +94,12 @@ function task (taskName, userConfOrCb, userCb) {
   // TODO: iterate over all keys of config object and check if they are correct
   //       maybe event do autocorrect, if user has typo?
   // TODO: also do this validation only once at the startup
-  const finalConfig = {}
-  if (callback) finalConfig.callback = callback
-  if (config.from) finalConfig.from = config.from
-  if (config.to) finalConfig.to = config.to
+  const taskData = {}
+  if (callback) taskData.callback = callback
+  if (config.from) taskData.from = config.from
+  if (config.to) taskData.to = config.to
 
-  tasks[taskName] = finalConfig
+  tasks[taskName] = taskData
 }
 
 async function run (taskName, data) {
@@ -76,7 +111,9 @@ async function run (taskName, data) {
   const task = tasks[taskName]
 
   const timeStart = Date.now()
-  log.prefixed(`→ ${taskName}`)
+  if (config.logLevel >= 1) {
+    log.prefixed(`→ ${taskName}`)
+  }
 
   if (task.from) {
     result = await new Promise((resolve, reject) => {
@@ -136,15 +173,11 @@ async function run (taskName, data) {
 
     // TODO: handle if promise is rejected and result is not array
     // TODO: return result[0] if user is not globbing but specifying one file?
+    // - check if pattern is glob with multiple files, if so, return result[0]
     switch (result.length) {
-      case 0:
-        result = null
-        break
-      case 1:
-        result = result[0]
-        break
-      default:
-        break
+      case 0: result = null; break
+      case 1:result = result[0]; break
+      default: break
     }
   } else {
     result = await task.callback(data)
@@ -155,14 +188,18 @@ async function run (taskName, data) {
     await fs.outputFile(task.to, result)
   }
 
-  const taskTime = Date.now() - timeStart
-  log.prefixed(`♥ ${taskName} - ${taskTime}ms`)
+  if (config.logLevel >= 1) {
+    const taskTime = Date.now() - timeStart
+    log.prefixed(`♥ ${taskName} - ${taskTime}ms`)
+  }
+
   return result
 }
 
 // export
 
 module.exports = {
+  configure,
   task,
   run,
   exec

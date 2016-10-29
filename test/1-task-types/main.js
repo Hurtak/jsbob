@@ -4,6 +4,10 @@ const jsbob = require('../../src/main.js')
 const fs = require('fs-promise')
 const path = require('path')
 
+jsbob.configure({
+  logLevel: 1
+})
+
 jsbob.task('main', async () => {
   await fs.remove(path.join(__dirname, 'to'))
 
@@ -74,22 +78,21 @@ jsbob.task('function input + return async', async (data) => {
 
 jsbob.task('file input', {
   from: path.join(__dirname, './from/1')
-}, async (fileContent) => {
-  console.assert('1')
+}, async (file) => {
+  console.assert(file.trim() === '1')
 })
 
 jsbob.task('file input + return sync', {
   from: path.join(__dirname, './from/1')
-}, async (fileContent, data) => {
-  return data + Number(fileContent)
+}, async (file, data) => {
+  return data + Number(file)
 })
-
 
 jsbob.task('file input + return async', {
   from: path.join(__dirname, './from/1')
-}, async (fileContent, data) => {
+}, async (files, data) => {
   const zero = await new Promise(resolve => setTimeout(resolve(0), 0))
-  return data + Number(fileContent) + zero
+  return data + Number(files[0]) + zero
 })
 
 jsbob.task('file output + return sync', {
@@ -108,8 +111,8 @@ jsbob.task('file output + return async', {
 jsbob.task('data input file output', {
   from: path.join(__dirname, './from/1'),
   to: path.join(__dirname, './to/9')
-}, async (fileContent, data) => {
-  return data + Number(fileContent)
+}, async (files, data) => {
+  return data + Number(files[0])
 })
 
 jsbob.task('data input file output + return async', {
