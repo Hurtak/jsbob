@@ -1,0 +1,30 @@
+.checkbox {
+  width: @size-button-width;
+  height: @size-button-height;
+  overflow: hidden;
+  border: @border-thin;
+  background-color: @color-background-button;
+  user-select: none;
+
+  &__label {
+    display: flex;
+    flex-direction: row;
+    width: 200%;
+    height: 100%;
+    transition: transform 0.3s @animation-bounce;
+    cursor: pointer;
+  }
+
+  &__caption {
+    width: 50%;
+    height: 100%;
+  }
+
+  &__checkbox {
+    display: none;
+  }
+
+  &__checkbox:checked + &__label {
+    transform: translateX(-50%);
+  }
+}

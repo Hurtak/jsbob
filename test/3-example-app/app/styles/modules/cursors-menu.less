@@ -1,0 +1,121 @@
+.cursors-menu {
+  height: 100%;
+  overflow: auto;
+
+  &__group {
+    padding: 0 26px;
+
+    &:first-child {
+      padding-top: 1em;
+    }
+
+    &:last-child {
+      padding-bottom: 1em;
+    }
+  }
+
+  &__heading {
+    margin-top: 1.0em;
+    margin-bottom: 0.3em;
+    font-size: 2.5rem;
+    font-weight: 400;
+    text-align: center;
+
+    .heading-icon() {
+      .img-center-norepeat-contain;
+      content: '';
+      display: inline-block;
+      vertical-align: top;
+      width: 0.8em;
+      height: 1em;
+      margin-right: 0.3em;
+    }
+
+    &--brushes::before {
+      .heading-icon;
+      width: 0.7em;
+      transform: translateY(1px);
+      background-image: url('../images/cursors/brushes.svg');
+    }
+
+    &--important-patterns::before {
+      .heading-icon;
+      width: 0.7em;
+      transform: translateY(1px);
+      background-image: url('../images/cursors/important-patterns.svg');
+    }
+
+    &--guns::before {
+      .heading-icon;
+      width: 0.7em;
+      transform: translateY(2px);
+      background-image: url('../images/cursors/guns.svg');
+    }
+
+    &--spaceships::before {
+      .heading-icon;
+      width: 0.75em;
+      transform: translateY(3px);
+      background-image: url('../images/cursors/spaceships.svg');
+    }
+
+    &--methuselahs::before {
+      .heading-icon;
+      transform: translateY(1px);
+      background-image: url('../images/cursors/methuselahs.svg');
+    }
+
+    &--puffers::before {
+      .heading-icon;
+      width: 0.9em;
+      transform: translateY(2px);
+      background-image: url('../images/cursors/puffers.svg');
+    }
+
+    &--oscilators::before {
+      .heading-icon;
+      width: 0.74em;
+      transform: translateY(1px);
+      background-image: url('../images/cursors/oscilators.svg');
+    }
+
+    &--still-lifes::before {
+      .heading-icon;
+      background-image: url('../images/cursors/still-lifes.svg');
+    }
+  }
+
+  &__cursor-wrapper {
+    @spacing: 6px;
+
+    display: inline-block;
+    cursor: pointer;
+    margin-bottom: @spacing;
+    margin-left: @spacing / 2;
+    margin-right: @spacing / 2;
+
+    &:hover {
+      color: @color-purple;
+    }
+
+    &:active {
+      transform: translateY(2px);
+    }
+  }
+
+  &__cursor {
+    display: block;
+    background-color: rgba(0, 0, 0, 0.05);
+    user-select: none;
+  }
+
+  &__cursor-caption {
+    text-align: center;
+    margin: 0;
+    padding: 0.5em 1em;
+    background-color: rgba(0, 0, 0, 0.02);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+}

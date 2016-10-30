@@ -11,7 +11,7 @@
 - persistant cache in some folder
 - caching per task
   - think if this is good idea to have turned on by default
-
+- fill "endigens" in package.json
 - rename to
   - cake
   - jsmake

@@ -1,0 +1,39 @@
+.slider {
+  display: flex;
+  width: 250px;
+  height: @size-button-height;
+  background-color: @color-background;
+  overflow: hidden;
+  user-select: none;
+
+  &__button {
+    width: @size-button-width;
+    height: 100%;
+    background-color: @color-background-button;
+    border: 0;
+    margin: 0;
+    outline: 0;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  &__items-view {
+    flex: 1;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  &__items-wrapper {
+    height: 100%;
+    white-space: nowrap;
+    transition: transform 0.3s @animation-bounce;
+  }
+
+  &__item {
+    display: inline-block;
+    width: 100%;
+    height: @size-button-height;
+    line-height: @size-button-height;
+    text-align: center;
+  }
+}
