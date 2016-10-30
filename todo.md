@@ -12,6 +12,7 @@
 - caching per task
   - think if this is good idea to have turned on by default
 - fill "endigens" in package.json
+- log what jsbob file is being executed
 - rename to
   - cake
   - jsmake

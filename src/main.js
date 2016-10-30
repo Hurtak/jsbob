@@ -196,6 +196,15 @@ async function run (taskName, data) {
   return result
 }
 
+// run default task or task specifiend in cli
+
+setTimeout(() => {
+  const cliTaskName = process.argv[2]
+  const taskName = cliTaskName || 'main'
+
+  run(taskName)
+})
+
 // export
 
 module.exports = {
